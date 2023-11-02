@@ -1,0 +1,237 @@
+polyalpha
+
+def polyencrypt(plaintext,key):
+    key=key.upper()
+    key_length=len(key)
+    ciphertext=""
+    for i in range(len(plaintext)):
+        char=plaintext[i]
+        shift=ord(key[i%key_length])-65
+        if char.isupper():
+            ciphertext+=chr((ord(char)-65+shift)%26+65)
+        else:
+            ciphertext+=chr((ord(char)-97+shift)%26+97)
+    return ciphertext
+plaintext="ABCD"
+key="bcd"
+print("ans is/n",polyencrypt(plaintext,key))
+
+
+def polydecrypt(plaintext,key):
+    key=key.upper()
+    key_length=len(key)
+    plaintext=""
+    for i in range(len(ciphertext)):
+        char=ciphertext[i]
+        shift=ord(key[i%key_length])-65
+        if char.isupper():
+            plaintext+=chr((ord(char)-65-shift)%26+65)
+        else:
+            plaintext+=chr((ord(char)-97-shift)%26+97)
+    return plaintext
+ciphertext="BDFE"
+key="bcd"
+print("ans is/n",polydecrypt(plaintext,key))
+
+
+
+
+
+
+
+
+
+
+playfair
+
+
+def prepare_text(text):
+    # Remove spaces and convert to uppercase
+    text = text.replace(" ", "").upper()
+    # Replace 'J' with 'I' (standard Playfair rule)
+    text = text.replace("J", "I")
+    return text
+
+def create_playfair_matrix(key):
+    # Create a Playfair matrix (5x5) using the given key
+    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+    key = prepare_text(key)
+    matrix = []
+    for letter in key + alphabet:
+        if letter not in matrix:
+            matrix.append(letter)
+    playfair_matrix = [matrix[i:i+5] for i in range(0, len(matrix), 5)]
+    return playfair_matrix
+
+def find_position(matrix, letter):
+    # Find the position of a letter in the Playfair matrix
+    for i in range(5):
+        for j in range(5):
+            if matrix[i][j] == letter:
+                return i, j
+
+def encrypt_digraph(matrix, digraph):
+    # Encrypt a digraph using the Playfair cipher rules
+    a, b = digraph[0], digraph[1]
+    a_row, a_col = find_position(matrix, a)
+    b_row, b_col = find_position(matrix, b)
+    
+    if a_row == b_row:
+        return matrix[a_row][(a_col + 1) % 5] + matrix[b_row][(b_col + 1) % 5]
+    elif a_col == b_col:
+        return matrix[(a_row + 1) % 5][a_col] + matrix[(b_row + 1) % 5][b_col]
+    else:
+        return matrix[a_row][b_col] + matrix[b_row][a_col]
+
+def playfair_encrypt(plaintext, key):
+    plaintext = prepare_text(plaintext)
+    matrix = create_playfair_matrix(key)
+    ciphertext = ""
+    for i in range(0, len(plaintext), 2):
+        digraph = plaintext[i:i+2]
+        if len(digraph) == 2:
+            ciphertext += encrypt_digraph(matrix, digraph)
+        else:
+            # Handle odd-length plaintext by appending 'X' before encryption
+            ciphertext += encrypt_digraph(matrix, digraph + 'X')
+    return ciphertext
+
+# Example usage
+plaintext = "HELLO"
+key = "KEYWORD"
+ciphertext = playfair_encrypt(plaintext, key)
+print("Plaintext:", plaintext)
+print("Ciphertext:", ciphertext)
+
+
+
+
+
+
+
+monoalpha
+
+
+def monoencry(plaintext,key):
+    alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    Cipher=""
+    for char in plaintext:
+        if char.upper() in alphabet:
+            charindex=alphabet.index(char.upper())
+            enc_chr=key[charindex]
+            if char.islower():
+                Cipher=Cipher+enc_chr.lower()
+            else:
+                Cipher=Cipher+enc_chr
+        else:
+             Cipher+=char       
+    return Cipher
+plaintext="ABC2VD"
+key="FADHIWOMNKPLJUXTBSQVGRCBYZ"
+print("ans is : ",monoencry(plaintext,key))
+
+
+
+
+
+
+
+
+
+
+hill cipher
+
+
+# Initialize the key matrix, message vector, and cipher matrix
+keyMatrix = [[0] * 3 for i in range(3)]
+messageVector = [[0] for i in range(3)]
+cipherMatrix = [[0] for i in range(3)]
+
+# Function to populate the key matrix from the input key
+def getKeyMatrix(key):
+    k = 0
+    # Iterate over the rows and columns of the key matrix
+    for i in range(3):
+        for j in range(3):
+            # Convert characters to integers and store in the key matrix
+            keyMatrix[i][j] = ord(key[k]) % 65
+            k += 1
+
+# Function to perform encryption using Hill Cipher algorithm
+def encrypt(messageVector):
+    # Iterate through rows of key matrix
+    for i in range(3):
+        # Iterate through columns of message vector (which is a column matrix)
+        for j in range(1):
+            cipherMatrix[i][j] = 0
+            # Perform matrix multiplication and modular arithmetic
+            for x in range(3):
+                cipherMatrix[i][j] += (keyMatrix[i][x] * messageVector[x][j])
+            cipherMatrix[i][j] = cipherMatrix[i][j] % 26
+
+# Hill Cipher implementation
+def HillCipher(message, key):
+    # Populate the key matrix
+    getKeyMatrix(key)
+    # Convert characters of the message to integers and store in message vector
+    for i in range(3):
+        messageVector[i][0] = ord(message[i]) % 65
+    # Encrypt the message vector
+    encrypt(messageVector)
+    CipherText = []
+    # Convert encrypted integers back to characters and append to CipherText list
+    for i in range(3):
+        CipherText.append(chr(cipherMatrix[i][0] + 65))
+    # Print the encrypted message
+    print("Ciphertext: ", "".join(CipherText))
+
+# Main function to take user input and call HillCipher function
+def main():
+    message = input("Enter the message to be encrypted: ").upper()
+    key = input("Enter the key: ").upper()
+    HillCipher(message, key)
+
+# Entry point of the program
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+ceaser cipher
+
+def encrypt(plain,key):
+    result=""
+    for i in range(len(plain)):
+        char=plain[i]
+        if char.islower():
+            result=result+chr((ord(char)-97+key)%26+97)
+        else:
+            result=result+chr((ord(char)-65+key)%26+65)
+
+    return result
+
+plaintext="H"
+key=3
+print("ans is : "+encrypt(plaintext,key))
+
+
+
+def decrypt(plain,key):
+    result=""
+    for i in range(len(plain)):
+        char=plain[i]
+        if char.islower():
+            result=result+chr((ord(char)-97-key)%26+97)
+        else:
+            result=result+chr((ord(char)-65-key)%26+65)
+
+    return result
+plaintext="ebh"
+key=3
+print("ans is : "+decrypt(plaintext,key))
+
+
+
